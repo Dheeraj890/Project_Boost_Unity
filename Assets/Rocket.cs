@@ -10,6 +10,11 @@ public class Rocket : MonoBehaviour
     Rigidbody rigidbody;
 
     AudioSource audioSource;
+
+    [SerializeField] float rcsThrust = 250f;
+
+    //SerializeField] float mainThrust = 1f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,12 +26,63 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        Rotate();
+        Thrusting();
+
     }
 
-    private void ProcessInput()
+    private void Rotate()
     {
 
+        float rotation = rcsThrust * Time.deltaTime;
+
+
+        if (Input.GetKey(KeyCode.A))
+        {
+
+
+            transform.Rotate(-Vector3.forward*rotation);
+            print("rotating left");
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+
+            transform.Rotate(Vector3.forward*rotation);
+
+
+            print("rotating right");
+        }
+    }
+
+
+    void OnCollisionEnter(Collision collision)
+    {
+
+
+        switch (collision.gameObject.tag)
+        {
+            case "Friendlly":
+                   print("Collided");
+
+                break;
+
+            case "Fuel":
+
+                break;
+
+            default:
+
+                print("dead");
+                break;
+        }
+    }
+
+    private void Thrusting()
+    {
+
+
+        rigidbody.freezeRotation = true;//Take control of mannual rotation
         if (Input.GetKey(KeyCode.Space))
         {
 
@@ -38,7 +94,7 @@ public class Rocket : MonoBehaviour
 
                 audioSource.Play();
             }
-            
+
             print("thrusting");
         }
         else
@@ -47,20 +103,6 @@ public class Rocket : MonoBehaviour
             audioSource.Stop();
         }
 
-        if (Input.GetKey(KeyCode.A))
-        {
-
-            transform.Rotate(Vector3.forward);
-            print("rotating left");
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-
-            transform.Rotate(-Vector3.forward);
-
-
-            print("rotating right");
-        }
+        rigidbody.freezeRotation = false;//resume physics control of rotation
     }
 }
